@@ -1,5 +1,6 @@
 const electron = require('electron');
-const app = electron.app;
+const { app, session } = electron;
+const os = require('os');
 const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
@@ -17,6 +18,10 @@ function createWindow() {
   }
   mainWindow.on('closed', () => mainWindow = null);
 }
+
+const p = '\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\4.24.3_1';
+app.whenReady()
+  .then(() => session.defaultSession.loadExtension(os.homedir() + p, { allowFileAccess: true }));
 
 app.on('ready', createWindow);
 
