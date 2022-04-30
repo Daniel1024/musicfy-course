@@ -1,16 +1,22 @@
+import { useState } from 'react';
 import Firebase from './utils/Firebase';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 function App() {
-  onAuthStateChanged(getAuth(Firebase), (user) => {
-    console.log(user ? 'Estamos logeado' : 'No estamos logeado');
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const auth = getAuth(Firebase);
+
+  onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+    setIsLoading(false);
   });
 
-  return (
-    <div className="App">
-      <h1>App Electron + React</h1>
-    </div>
-  );
+  if (isLoading) {
+    return <h1>Cargando</h1>;
+  }
+
+  return !user ? <h1>Usuario no logeado</h1> : <h1>Usuario logeado</h1>;
 }
 
 export default App;
