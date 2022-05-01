@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import Firebase from './utils/Firebase';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { auth } from './utils/Firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import Auth from './pages/Auth';
 
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const auth = getAuth(Firebase);
 
   onAuthStateChanged(auth, (currentUser) => {
     setUser(currentUser);
@@ -13,10 +13,29 @@ function App() {
   });
 
   if (isLoading) {
-    return <h1>Cargando</h1>;
+    return <h1>Cargando...</h1>;
   }
 
-  return !user ? <h1>Usuario no logeado</h1> : <h1>Usuario logeado</h1>;
+  return user ? <UserLogeed/> : <Auth/>;
+}
+
+function UserLogeed() {
+  const logout = () => {
+    auth.signOut();
+  };
+  const style = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'column',
+    height: '100vh',
+  };
+  return (
+    <div style={style}>
+      <h1>Usuario Logeado</h1>
+      <button onClick={logout}>Cerrar Sessión</button>
+    </div>
+  );
 }
 
 export default App;
