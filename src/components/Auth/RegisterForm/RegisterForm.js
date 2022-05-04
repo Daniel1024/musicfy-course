@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, Icon, Form, Input } from 'semantic-ui-react';
 import { validateEmail } from '../../../utils/Validation';
+import { toast } from 'react-toastify';
 import firebase from '../../../utils/Firebase';
 import 'firebase/compat/auth';
 
@@ -48,10 +49,10 @@ export default function RegisterForm({ setSelectedForm }) {
         .auth()
         .createUserWithEmailAndPassword(formData.email, formData.password)
         .then(() => {
-          console.log('Registro completado.');
+          toast.success('Registro completado.');
         })
         .catch(() => {
-          console.error('Error al crear la cuenta.');
+          toast.error('Error al crear la cuenta.');
         })
         .finally(() => {
           setIsLoading(false);

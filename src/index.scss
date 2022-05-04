@@ -10,3 +10,20 @@ body {
 code {
   font-family: "Source Code Pro", "MesloLGS NF", Consolas, "Courier New", monospace;
 }
+
+.Toastify {
+  .Toastify__toast-container--top-center {
+    width: 100%;
+    top: 0;
+
+    .Toastify__toast--success {
+      background-color: $background-primary;
+      color: white;
+
+      .Toastify__close-button {
+        align-self: center;
+
+      }
+    }
+  }
+}
