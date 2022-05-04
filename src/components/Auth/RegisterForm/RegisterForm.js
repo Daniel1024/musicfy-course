@@ -1,36 +1,96 @@
+import { useState } from 'react';
 import { Button, Icon, Form, Input } from 'semantic-ui-react';
-import { auth } from '../../../utils/Firebase';
+import { validateEmail } from '../../../utils/Validation';
+import firebase from '../../../utils/Firebase';
+import 'firebase/compat/auth';
 
 import './RegisterForm.scss';
 
 export default function RegisterForm({ setSelectedForm }) {
+  const [formData, setFormData] = useState(defaultValueForm());
+  const [showPass, setShowPass] = useState(false);
+  const [formError, setFormError] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handlerShowPass = () => {
+    setShowPass(prevState => !prevState);
+  };
+
+  const onChange = ({ target }) => {
+    setFormData({
+      ...formData,
+      [target.name]: target.value,
+    });
+  };
+
   const onSubmit = () => {
-    console.log('Formulario enviado');
+    setFormError({});
+    const errors = {};
+    let formOk = true;
+
+    if (!validateEmail(formData.email)) {
+      errors.email = true;
+      formOk = false;
+    }
+    if (formData.password.length < 6) {
+      errors.password = true;
+      formOk = false;
+    }
+    if (!formData.username) {
+      errors.username = true;
+      formOk = false;
+    }
+    setFormError(errors);
+
+    if (formOk) {
+      setIsLoading(true);
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(formData.email, formData.password)
+        .then(() => {
+          console.log('Registro completado.');
+        })
+        .catch(() => {
+          console.error('Error al crear la cuenta.');
+        })
+        .finally(() => {
+          setIsLoading(false);
+          setFormData(null);
+        });
+    }
   };
 
   return (
     <div className="register-from">
       <h1>Empieza a escuchar con una cuenta de Musify gratis.</h1>
-      <Form onSubmit={onSubmit}>
+      <Form onSubmit={onSubmit} onChange={onChange}>
         <Form.Field>
           <Input
             type="text"
             name="email"
             placeholder="Correo electrónico"
             icon="mail outline"
-            // onChange={}
-            // error={}
+            error={formError.email}
           />
+          {formError.email && (
+            <span className="error-text">
+              Por favor, introduce un correo electronico valido
+            </span>
+          )}
         </Form.Field>
         <Form.Field>
           <Input
-            type="password"
+            type={showPass ? 'text' : 'password'}
             name="password"
             placeholder="Contraseña"
-            icon="eye"
-            // onChange={}
-            // error={}
+            icon={<Icon name={showPass ? 'eye slash outline' : 'eye'} link onClick={handlerShowPass}/>}
+            error={formError.password}
           />
+          {formError.password && (
+            <span className="error-text">
+              Por favor, elige una contraseña superior a 5 caracteres.
+            </span>
+          )}
         </Form.Field>
         <Form.Field>
           <Input
@@ -38,11 +98,15 @@ export default function RegisterForm({ setSelectedForm }) {
             name="username"
             placeholder="¿Como deberiamos llamarte?"
             icon="user circle outline"
-            // onChange={}
-            // error={}
+            error={formError.username}
           />
+          {formError.username && (
+            <span className="error-text">
+              Por favor, introduce un nombre
+            </span>
+          )}
         </Form.Field>
-        <Button type="submit">Continuar</Button>
+        <Button type="submit" loading={isLoading}>Continuar</Button>
       </Form>
       <div className="register-from__options">
         <p onClick={() => setSelectedForm(null)}>Volver</p>
@@ -52,4 +116,12 @@ export default function RegisterForm({ setSelectedForm }) {
       </div>
     </div>
   );
+}
+
+function defaultValueForm() {
+  return {
+    email: '',
+    password: '',
+    username: '',
+  };
 }

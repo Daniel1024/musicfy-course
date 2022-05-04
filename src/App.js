@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { auth } from './utils/Firebase';
-import { onAuthStateChanged } from 'firebase/auth';
 import Auth from './pages/Auth';
+import firebase from './utils/Firebase';
+import 'firebase/compat/auth';
 
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  onAuthStateChanged(auth, (currentUser) => {
+  firebase.auth().onAuthStateChanged(currentUser => {
     setUser(currentUser);
     setIsLoading(false);
   });
@@ -21,7 +21,7 @@ function App() {
 
 function UserLogeed() {
   const logout = () => {
-    auth.signOut();
+    firebase.auth().signOut();
   };
   const style = {
     display: 'flex',
